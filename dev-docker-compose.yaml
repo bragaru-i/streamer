@@ -1,0 +1,94 @@
+version: "3"
+
+services:
+  ### NODEJS BACKEND APP
+  nodejs:
+    container_name: nodejs
+    hostname: nodejs
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./backend
+    environment:
+      NODE_ENV: development
+      DATABASE_USERNAME: user
+      DATABASE_PASSWORD: password
+      DATABASE_HOST: db
+      DATABASE_NAME: mongodata
+      DATABASE_CLIENT: mongodb
+      DATABASE_PORT: 27017
+
+      JWT_SECRET: super-secret-jwt-
+      JWT_EXPIRES_IN: 15m
+      JWT_COOKIE_EXPIRES_IN: 15m
+
+      REFRESH_TOKEN_EXPIRES_IN: 30
+      REFRESH_TOKEN_SECRET: 30
+
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    volumes:
+      - ./backend:/usr/src/app:rw
+      - /usr/src/app/node_modules
+    networks:
+      - streamer-network
+
+  ### NGINX proxy server
+  nginx:
+    container_name: nginx
+    hostname: nginx
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - "3050:80"
+    depends_on:
+      - front
+      - nodejs
+    networks:
+      - streamer-network
+
+  ## FRONTEND CRA APP
+  front:
+    container_name: front
+    hostname: front
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      DANGEROUSLY_DISABLE_HOST_CHECK: "true"
+    volumes:
+      - ./frontend/:/usr/app
+      - /usr/app/node_modules
+    networks:
+      - streamer-network
+    depends_on:
+      - nodejs
+
+  # DB: mongo
+  db:
+    container_name: db
+    hostname: db
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
+    ports:
+      - "27017:27017"
+    networks:
+      - streamer-network
+    volumes:
+      - dbdata:/data/db
+
+volumes:
+  dbdata:
+  node_modules:
+  web-root:
+      driver: local
+
+networks:
+  streamer-network:
+    driver: bridge
