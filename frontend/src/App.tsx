@@ -22,7 +22,7 @@ const App: React.FC = () => {
   console.log(response)
   return (
     <div className="row">
-      <Header/>
+      <Header />
     </div>
   );
 }
