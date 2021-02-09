@@ -8,9 +8,12 @@ router.route('/').get((req, res, next) => {
   });
 });
 
-router.route("/:id").get((req, res, next) => {
+router.route("/:room").get((req, res, next) => {
+
+  const room = req.params.room
   res.status(200).json({
     message: "Room ID created",
+    room
   });
 });
 
