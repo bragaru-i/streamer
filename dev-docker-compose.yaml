@@ -55,7 +55,7 @@ services:
     hostname: front
     build:
       dockerfile: Dockerfile.dev
-      context: ./frontend
+      context: ./client
     ports:
       - "3000:3000"
     environment:
