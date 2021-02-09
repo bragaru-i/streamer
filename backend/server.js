@@ -1,8 +1,8 @@
 const path = require("path");
 require("dotenv").config({ path: path.join("config.env") });
 const mongoose = require("mongoose");
+const http = require("http");
 const colors = require("colors");
-
 
 colors.enable();
 
@@ -29,7 +29,14 @@ mongoose
 
 const port = process.env.PORT || 5000;
 
-const server = app.listen(port, () => {
+const server = http.createServer(app);
+const io = require("socket.io")(server);
+
+io.sockets.on("error", (e) =>
+  console.log('---Sockets Error---'.green.bold.bgBrightWhite)
+);
+
+server.listen(port, () => {
   console.log(
     `  🔆🔆🔆    Server runs on port: ${port}   🔆🔆🔆`.green.bold.bgBrightWhite
   );
