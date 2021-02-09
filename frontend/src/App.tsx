@@ -1,24 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
+import { io } from "socket.io-client";
+
+
+import Header from './components/Header/Header';
+
 import './App.css';
 
-function App() {
+// TODO: change socketio endpoint
+
+
+const App: React.FC = () => {
+
+  const [response, setResponse] = useState();
+
+  useEffect(() => {
+    const socket = io('/api/v1/');
+    socket.on("FromAPI", (data: React.SetStateAction<any>) => {
+      setResponse(data);
+    });
+  }, []);
+  console.log(response)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="row">
+      <Header/>
     </div>
   );
 }

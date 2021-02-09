@@ -1,0 +1,17 @@
+.nav {
+  display: flex;
+  font-size:1.6rem;
+  height: 6rem;
+  align-items: center;
+
+  &Items {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  &Item:not(:last-child) {
+    margin-right: 1.6rem;
+    text-decoration: none;
+  }
+}
