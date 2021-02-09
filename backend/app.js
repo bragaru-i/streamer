@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 
 const AppError = require('./utils/appError')
 const globalErrorHandler = require('./controllers/errorController');
+const chatRouter = require('./routes/chatRoute')
 
 
 const app = express();
@@ -21,7 +22,8 @@ app.use(express.json());
 // cookie parser
 app.use(cookieParser());
 
-
+// enabling chat rooms
+app.use('/chat', chatRouter)
 
 
 // GLobal error handling
