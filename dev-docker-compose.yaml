@@ -62,7 +62,7 @@ services:
       DANGEROUSLY_DISABLE_HOST_CHECK: "true"
       CHOKIDAR_USEPOLLING: "true"
     volumes:
-      - ./frontend/:/usr/app:rw
+      - ./client/:/usr/app:rw
       - /usr/app/node_modules
     networks:
       - streamer-network
