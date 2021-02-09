@@ -29,8 +29,8 @@ services:
     depends_on:
       - db
     volumes:
-      - ./backend:/usr/src/app:rw
-      - /usr/src/app/node_modules
+      - ./backend:/usr/app:rw
+      - /usr/app/node_modules
     networks:
       - streamer-network
 
@@ -86,7 +86,6 @@ services:
 
 volumes:
   dbdata:
-  node_modules:
   web-root:
     driver: local
 
