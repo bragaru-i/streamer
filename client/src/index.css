@@ -10,6 +10,10 @@ html {
   font-size: 62.5%;
   background-color: white;
 }
+body {
+  font-size: 1.6rem;
+}
+
 .spacer {
   flex: 1;
 }
@@ -17,6 +21,6 @@ html {
 
 
 .row {
-  width: 128rem;
+  width: 80rem;
   margin: 0 auto;
 }

@@ -14,6 +14,7 @@ const Broadcast = (props: Props) => {
   return (
     <div>
 
+    Shows All Broadcasts
     </div>
   )
 }

@@ -17,8 +17,8 @@ const Header = (props: Props) => {
          </div>
         <div className="spacer" />
         <ul className={styles.navItems}>
-          <NavLink className = {styles.navItem} to="/broadcasts">All Broadcasts</NavLink>
-          <NavLink className = {styles.navItem} to="/">Home</NavLink>
+          <NavLink className={styles.navItem} to="/broadcasts">All Broadcasts</NavLink>
+          <NavLink className={styles.navItem} to="/">Home</NavLink>
         </ul>
       </nav>
     </header>

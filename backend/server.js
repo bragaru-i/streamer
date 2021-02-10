@@ -1,7 +1,9 @@
+const child_process = require("child_process");
+
 const path = require("path");
+
 require("dotenv").config({ path: path.join("config.env") });
 const mongoose = require("mongoose");
-const socketio =require('socket.io')
 const colors = require("colors");
 
 colors.enable();
@@ -38,4 +40,20 @@ const server = app.listen(port, () => {
       .bgBrightWhite
   );
 });
-socketio(server)
+
+const io = require("socket.io")(server, {
+  cors: "*",
+});
+
+io.on("connect", (socket) => {
+  console.log(`Socket connected on ID: ${socket.id}`.bgCyan);
+  let match;
+  
+  socket.on("from-webrtc", (blob) => {
+    console.log(`${blob}`.america)
+    socket.emit('get-rtc-server', blob )
+  });
+  // socket.on('disconnect', (reason) => {
+  //   ffmpeg.kill('SIGINT');
+  // });
+});
