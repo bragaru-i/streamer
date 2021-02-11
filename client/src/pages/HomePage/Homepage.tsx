@@ -1,23 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { io } from 'socket.io-client';
-import { Stream } from 'stream';
+import * as mediaCapture from '../../utils/mediaDevices'
 
 import styles from './HomePage.module.scss'
 
 
-interface Props {
-
-}
-
-interface Constrains {
-  audio: boolean,
-  video: {
-    width: number,
-    height: number
-  }
-}
-const Homepage = (props: Props) => {
-  const [constrains, setConstrains] = useState<Constrains>({
+const Homepage = () => {
+  const [constrains, setConstrains] = useState<mediaCapture.Constrains>({
     audio: false,
     video: {
       width: 400,
@@ -29,47 +18,36 @@ const Homepage = (props: Props) => {
   const socket = io('http://localhost:5000/');
   // const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  useEffect(() => {
-    const getUserMedia = (params: Constrains) => (new Promise((successCb: (stream: any) => void, errorCb) => {
-      navigator.getUserMedia.call(navigator, params, successCb, errorCb)
-    }))
-    getUserMedia(constrains).then(
-      (stream) => {
-        if (videoRef.current) videoRef.current.srcObject = stream
-        videoRef.current?.play()
+  // useEffect(() => {
+  //   mediaCapture.getUserMedia(constrains).then(
+  //     (stream) => {
+  //       if (videoRef.current) videoRef.current.srcObject = stream
+  //       videoRef.current?.play()
 
-      }
-    ).catch(console.log)
+  //     }
+  //   ).catch(console.log)
 
-  }, [constrains])
+  // }, [constrains])
 
   useEffect(() => {
-    socket.on('connecting', () => console.log('Sockets Connetcted'));
-
-    const mediaDevices = navigator.mediaDevices as any;
-    if (mediaDevices) {
-      console.log('Media devices supported!')
-      let chunks: BlobPart[]
-      mediaDevices.getDisplayMedia({ cursor: true }).then((mediaStream: any) => {
-        const mediaRecorder = new MediaRecorder(mediaStream)
-        mediaRecorder.onstart = e => chunks = [];
-        mediaRecorder.ondataavailable = e => chunks.push(e.data)
-        mediaRecorder.onstop = e => {
-          const blob = new Blob(chunks);
-          socket.emit('from-webrtc', blob)
+    mediaCapture.getDisplayMedia(constrains).then(
+      stream => {
+        socket.on('connect', () => console.log('Connected'))
+        let mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = e => {
+          return socket.emit('webrtc-binary', e.data)
         }
-        mediaRecorder.start()
-        setTimeout(() => {
-          mediaRecorder.stop()
-        }, 5000)
-      })
-    }
-    socket.on('get-rtc-server', (blob: MediaStream) => {
-      if (videoCapRef.current) videoCapRef.current.srcObject = blob
+        mediaRecorder.start(3000)
+
+        videoCapRef.current!.srcObject = stream
+      }
+    )
+
+
+    return (() => {
+      socket.on('disconnect', () => console.log("Sockets disconnected"))
     })
-
   }, [])
-
 
   return (
     <div className={styles.container}>
