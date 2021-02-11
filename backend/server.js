@@ -1,6 +1,5 @@
-const child_process = require("child_process");
-
 const path = require("path");
+const spawn = require("child_process").spawn;
 
 require("dotenv").config({ path: path.join("config.env") });
 const mongoose = require("mongoose");
@@ -41,19 +40,50 @@ const server = app.listen(port, () => {
   );
 });
 
+spawn("ffmpeg", ["-h"]).on("error", function (m) {
+  console.error(
+    "FFMpeg not found in system cli; please install ffmpeg properly or make a softlink to ./!"
+  );
+  process.exit(-1);
+});
+
 const io = require("socket.io")(server, {
   cors: "*",
 });
 
 io.on("connect", (socket) => {
-  console.log(`Socket connected on ID: ${socket.id}`.bgCyan);
-  let match;
-  
-  socket.on("from-webrtc", (blob) => {
-    console.log(`${blob}`.america)
-    socket.emit('get-rtc-server', blob )
+  socket.on("broadcaster", () => {
+    broadcaster = socket.id;
+    socket.broadcast.emit("broadcaster");
   });
-  // socket.on('disconnect', (reason) => {
-  //   ffmpeg.kill('SIGINT');
-  // });
+  socket.on("watcher", () => {
+    socket.to(broadcaster).emit("watcher", socket.id);
+  });
+  socket.on("offer", (id, message) => {
+    socket.to(id).emit("offer", socket.id, message);
+  });
+  socket.on("answer", (id, message) => {
+    socket.to(id).emit("answer", socket.id, message);
+  });
+  socket.on("candidate", (id, message) => {
+    socket.to(id).emit("candidate", socket.id, message);
+  });
+  socket.on("disconnect", () => {
+    socket.to(broadcaster).emit("disconnectPeer", socket.id);
+  });
 });
+
+let broadcaster;
+
+// io.sockets.on("connection", socket => {
+//   socket.on("broadcaster", () => {
+//     broadcaster = socket.id;
+//     socket.broadcast.emit("broadcaster");
+//   });
+//   socket.on("watcher", () => {
+//     socket.to(broadcaster).emit("watcher", socket.id);
+//   });
+//   socket.on("disconnect", () => {
+//     socket.to(broadcaster).emit("disconnectPeer", socket.id);
+//   });
+// });
