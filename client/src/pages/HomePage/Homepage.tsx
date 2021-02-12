@@ -5,7 +5,7 @@ import styles from './HomePage.module.scss'
 
 
 
-const Homepage : React.FC = () => {
+const Homepage: React.FC = () => {
 
   const { userVideo, callPeer, partnerVideo, receivingCall, users, acceptCall, caller, yourID } = useHomepageHook()
   let incomingCall = receivingCall && (
