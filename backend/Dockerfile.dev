@@ -2,7 +2,6 @@ FROM node:alpine
 WORKDIR /usr/app
 COPY ./package*.json ./
 RUN  npm install
-RUN  apt-get install ffmpeg -y -vv
 COPY . .
 EXPOSE 5000
 CMD ["npm", "run", "start"]

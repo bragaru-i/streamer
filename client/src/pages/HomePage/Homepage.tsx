@@ -1,57 +1,37 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { io } from 'socket.io-client';
-import * as mediaCapture from '../../utils/mediaDevices'
+import React from 'react'
+import useHomepageHook from './useHomepageHook'
 
 import styles from './HomePage.module.scss'
 
 
-const Homepage = () => {
-  const [constrains, setConstrains] = useState<mediaCapture.Constrains>({
-    audio: false,
-    video: {
-      width: 400,
-      height: 300
-    }
-  })
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const videoCapRef = useRef<HTMLVideoElement>(null);
-  const socket = io('http://localhost:5000/');
-  // const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  // useEffect(() => {
-  //   mediaCapture.getUserMedia(constrains).then(
-  //     (stream) => {
-  //       if (videoRef.current) videoRef.current.srcObject = stream
-  //       videoRef.current?.play()
+const Homepage : React.FC = () => {
 
-  //     }
-  //   ).catch(console.log)
-
-  // }, [constrains])
-
-  useEffect(() => {
-    mediaCapture.getDisplayMedia(constrains).then(
-      stream => {
-        socket.on('connect', () => console.log('Connected'))
-        let mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.ondataavailable = e => {
-          return socket.emit('webrtc-binary', e.data)
-        }
-        mediaRecorder.start(3000)
-
-        videoCapRef.current!.srcObject = stream
-      }
-    )
+  const { userVideo, callPeer, partnerVideo, receivingCall, users, acceptCall, caller, yourID } = useHomepageHook()
+  let incomingCall = receivingCall && (
+    <div>
+      <h1>{caller} is calling you</h1>
+      <button onClick={acceptCall}>Accept</button>
+    </div>
+  )
 
 
-    return (() => {
-      socket.on('disconnect', () => console.log("Sockets disconnected"))
-    })
-  }, [])
 
   return (
     <div className={styles.container}>
-      <video className={styles.videoCapture} ref={videoCapRef} autoPlay></video>
+      <div> Your video</div>
+      <video className={styles.videoCapture} ref={userVideo} autoPlay></video>
+      {incomingCall}
+      <div> Parner Video</div>
+      <video className={styles.videoCapture} ref={partnerVideo} autoPlay></video>
+      {Object.keys(users).map(key => {
+        if (key === yourID) {
+          return null;
+        }
+        return (
+          <button key={key} onClick={() => callPeer(key)}>Call {key}</button>
+        );
+      })}
       {/* <video className={styles.videoCam} ref={videoRef}></video> */}
       {/* <canvas className={styles.canvas} ref={canvasRef}></canvas> */}
     </div >
