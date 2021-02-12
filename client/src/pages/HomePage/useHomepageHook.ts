@@ -46,6 +46,9 @@ const useHomePageHook = () => {
       setCaller(data.from);
       setCallerSignal(data.signal);
     })
+    return (()=>{
+      socket.current.on('disconnect', ()=> console.log('Sockets disconnected'))
+    })
   }, [])
 
 
